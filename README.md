@@ -16,19 +16,6 @@ a geospatial dashboard backed by Supabase (PostGIS + Realtime).
 - **Recharts** for historical telemetry charts
 - Strict TypeScript throughout, no `any`
 
-## Design system
-
-The UI follows Vercel's Geist design language: a true-black (`#0A0A0A`) canvas,
-a single neutral gray scale for panels/borders/text, Geist Sans for UI copy
-and Geist Mono for data/labels, `#0070F3` as the one interactive accent
-(links, focus rings, the demo-mode indicator), and monochrome (white-on-black)
-buttons for primary actions — color is reserved entirely for node/alert
-status (green/amber/red/gray). All of it lives in two places:
-
-- `tailwind.config.ts` — the `canopy` neutral scale and `signal` accent/status colors
-- `src/lib/constants.ts` — `STATUS_COLORS` / `SEVERITY_COLORS`, which drive the map markers, badges, and charts
-
-Change a value in either file and it propagates everywhere that references it.
 
 ## Architecture
 
@@ -69,18 +56,7 @@ npm run dev
 
 That's it — if `NEXT_PUBLIC_SUPABASE_URL` isn't set, the app automatically
 runs against an in-memory simulator (`src/lib/demo/store.ts`) instead of
-Supabase: five nodes, six hours of synthetic history, and a live tick loop
-that generates new telemetry every few seconds (with one node, "Node
-Charlie", periodically spiking into a chainsaw/tree-fall event so there's
-always something to look at). Acknowledging alerts and saving node notes
-both work in this mode too — they mutate the in-memory store directly
-instead of calling Supabase. The header shows a **Demo Data** badge whenever
-this mode is active, and `middleware.ts` skips Supabase auth entirely so
-nothing throws on missing credentials.
-
-Nothing here persists across a page reload or `npm run dev` restart — it's
-for UI development and demos only. Move to Option B whenever you want real
-persistence, multi-device sync, or actual edge nodes.
+Supabase.
 
 ### Option B: Connect a real Supabase backend
 
@@ -142,9 +118,7 @@ Fill in:
 
 If you applied the migration via the SQL editor rather than `supabase db push`,
 double check in **Database → Replication** that `nodes`, `telemetry`, and
-`alerts` are all added to the `supabase_realtime` publication (the migration
-does this automatically, but hosted dashboards sometimes require a manual
-toggle the first time).
+`alerts` are all added to the `supabase_realtime` publication 
 
 #### 7. Run the dev server
 
@@ -231,17 +205,7 @@ supabase/
   seed.sql                    Local dev sample data
 ```
 
-## Notes on authentication
-
-This build assumes an already-authenticated operator (e.g. via Supabase Auth
-email/password or SSO configured separately) — RLS policies gate reads and
-writes on the `authenticated` role. Add a login page and
-`supabase.auth.signInWithPassword` / your SSO provider of choice in front of
-`/` if you need to gate the dashboard itself; the middleware in
-`src/middleware.ts` is already wired to keep the auth session refreshed on
-every request.
-
 ## Credits
 
-**EcoSentinel** is built and maintained by **Santri Lab**, Universitas Jember.
+**EcoSentinel** is built and maintained by **Ananta Pamungkas** for Santri lab team Universitas Jember.
 
